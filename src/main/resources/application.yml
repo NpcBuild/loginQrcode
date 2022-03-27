@@ -1,0 +1,64 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: login
+  thymeleaf:
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+  mail:
+    host: smtp.qq.com
+    username: 1623285565@qq.com
+    password: "bzymasfcpivnbbac"
+#  启动SSL时的配置
+    smtp:
+      socketFactory:
+        class: javax.net.ssl.SSLSocketFactory
+        fallback: false
+        port: 465
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/yf?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=CTT
+    username: root
+    password: root
+  mybatis:
+    type-aliases-package: com.qrcodelogin.entity
+    mapper-locations: classpath:com/qrcodelogin/Dao/mapper/*.xml
+    configuration:
+      map-underscore-to-camel-case: true
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 1000   #连接超时时间
+    database: 0   #默认数据库
+    jedis:
+      pool:
+        max-active: 10
+        max-idle: 8   #最大维持连接数
+        min-idle: 2
+        max-wait: 100   #最大等待连接超时时间
+  kafka:
+    bootstrap-servers:    #定义主机列表
+      localhost:9092
+    template:
+      default-topic: yftopic   #定义主题名称
+    producer:   #定义生产者配置
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+    consumer:   #定义消费者配置
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      group-id: group-1   #数据分组
+    listener:
+      missing-topics-fatal: false
+#    properties:
+#      sasl.mechanism: PLAIN    #安全机制
+#      security.protocol: SASL_PLAINTEXT   #安全协议
+
+
+

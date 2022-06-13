@@ -1,6 +1,9 @@
 package com.qrcodelogin.login;
 
+import com.qrcodelogin.Dao.UserMapper;
+import com.qrcodelogin.entity.User;
 import com.qrcodelogin.service.RoleService;
+import com.qrcodelogin.service.UserService;
 import com.qrcodelogin.utils.ServerResponseEnum;
 import com.qrcodelogin.utils.ServerResponseVO;
 import org.apache.shiro.SecurityUtils;
@@ -19,27 +22,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 
-//@RequestMapping("")
+/**
+ * @author wow
+ */
 @RestController
 @CrossOrigin
 public class LoginController {
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserMapper userMapper;
 
     @PostMapping("/logins")
-    public ServerResponseVO login(
-//            @RequestParam(value = "account") String account,
-//            @RequestParam(value = "password") String password
-    @RequestBody Map<String,String> map
-    ) {
-        String account = map.get("account");
-        String password = map.get("password");
+    public ServerResponseVO login(@RequestBody User user) {
         Subject userSubject = SecurityUtils.getSubject();
-        UsernamePasswordToken token = new UsernamePasswordToken(account, password);
+        UsernamePasswordToken token = new UsernamePasswordToken(user.getAccount(), user.getUserPwd());
         try {
             //登陆验证
             userSubject.login(token);
-            return ServerResponseVO.success();
+            return ServerResponseVO.success(token);
         }catch (UnknownAccountException e) {
             return ServerResponseVO.error(ServerResponseEnum.ACCOUNT_NOT_EXIST);
         }catch (DisabledAccountException e) {
@@ -51,6 +54,18 @@ public class LoginController {
             return ServerResponseVO.error(ServerResponseEnum.ERROR);
         }
     }
+
+    @PostMapping("/regist")
+    public ServerResponseVO registe(@RequestBody User user){
+        User existUser = userService.findByAccount(user.getAccount());
+        if (existUser != null){
+            return ServerResponseVO.error(ServerResponseEnum.DUPLICATE_ACCOUNT);
+        } else {
+            userMapper.regist(user);
+        }
+        return ServerResponseVO.success("注册成功");
+    }
+
 
     @GetMapping("/role")
     @RequiresRoles("vip")

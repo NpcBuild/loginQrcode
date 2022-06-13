@@ -12,4 +12,8 @@
         from t_user
         where userName = #{account}
     </select>
+    <insert id="regist" parameterType="com.qrcodelogin.entity.User">
+        insert into t_user(userName,userPwd,account)
+        values(#{user.userName},#{user.userPwd},#{user.account})
+    </insert>
 </mapper>

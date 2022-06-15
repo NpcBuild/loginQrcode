@@ -1,5 +1,7 @@
 package com.qrcodelogin.login;
 
+import com.kafka.domain.KafkaMessage;
+import com.kafka.producer.KafkaLoginMailProducer;
 import com.qrcodelogin.Dao.UserMapper;
 import com.qrcodelogin.entity.User;
 import com.qrcodelogin.service.RoleService;
@@ -15,11 +17,9 @@ import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.annotation.RequiresRoles;
 import org.apache.shiro.subject.Subject;
+import org.checkerframework.checker.units.qual.K;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 
 /**
@@ -34,6 +34,8 @@ public class LoginController {
     private UserService userService;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private KafkaLoginMailProducer kafkaLoginMailProducer;
 
     @PostMapping("/logins")
     public ServerResponseVO login(@RequestBody User user) {
@@ -42,6 +44,8 @@ public class LoginController {
         try {
             //登陆验证
             userSubject.login(token);
+            KafkaMessage kafkaMessage = new KafkaMessage(0,"login","登陆成功");
+            kafkaLoginMailProducer.sendMsgSync(kafkaMessage);
             return ServerResponseVO.success(token);
         }catch (UnknownAccountException e) {
             return ServerResponseVO.error(ServerResponseEnum.ACCOUNT_NOT_EXIST);

@@ -1,7 +1,8 @@
 package com.qrcodelogin.login;
 
 import com.QrcodeloginApplication;
-import com.qrcodelogin.service.IMessageProducer;
+import com.kafka.domain.KafkaMessage;
+import com.kafka.producer.KafkaProducer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.util.concurrent.ExecutionException;
+
 @SpringBootTest(classes = QrcodeloginApplication.class)  //定义要测试的SpringBoot类
 @RunWith(SpringJUnit4ClassRunner.class)   //使用JUnit进行测试
 @WebAppConfiguration   //进行Web应用配置
@@ -17,7 +20,7 @@ public class test {
     @Autowired
     private RedisTemplate<String, String> redisTemplate; //引入RedisTemplate
     @Autowired
-    private IMessageProducer iMessageProducer;
+    private KafkaProducer kafkaProducer;
     @Test
     public void testSet(){
         //操作String类型
@@ -44,6 +47,14 @@ public class test {
 
     @Test
     public void testKafka(){
-        iMessageProducer.send("123456");
+        KafkaMessage kafkaMessage = new KafkaMessage();
+        kafkaMessage.setMessage("测试kafka");
+        try {
+            kafkaProducer.sendMsgSync(kafkaMessage);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

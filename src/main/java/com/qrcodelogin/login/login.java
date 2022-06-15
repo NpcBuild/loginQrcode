@@ -100,9 +100,6 @@ public class login {
         return "scan";
     }
 
-
-    @Autowired
-    private JavaMailSender javaMailSender;
     @ResponseBody
     @GetMapping(path = "accept")
     public String accept(String id, String token) throws IOException {
@@ -112,21 +109,6 @@ public class login {
             sseEmitter.send("login#qrlogin=" + token);
             sseEmitter.complete();
             cache.remove(id);
-        }
-        /**
-         * 登陆成功发送邮件提醒
-         */
-        SimpleMailMessage msg = new SimpleMailMessage();
-        msg.setFrom("1623285565@qq.com");
-        msg.setBcc();
-        msg.setTo("zhazhafei@aliyun.com");
-        msg.setSubject("登录");
-        msg.setText("扫码登录成功提醒,token为："+token);
-        try {
-            javaMailSender.send(msg);
-        } catch (MailException ex) {
-            System.err.println(ex.getMessage());
-            return "短信发送失败:"+ex.getMessage();
         }
         return "登陆成功：" + token;
     }

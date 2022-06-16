@@ -1,5 +1,6 @@
 package com.qrcodelogin.login;
 
+import com.aop.login.anno.RedisLimit;
 import com.kafka.domain.KafkaMessage;
 import com.kafka.producer.KafkaLoginMailProducer;
 import com.qrcodelogin.Dao.UserMapper;
@@ -37,6 +38,12 @@ public class LoginController {
     @Autowired
     private KafkaLoginMailProducer kafkaLoginMailProducer;
 
+    /**
+     * 30 s 内尝试超过 10 次，锁定 用户 600 s
+     * @param user
+     * @return
+     */
+    @RedisLimit(identifier = "account", watch = 30, lock = 600, times = 10)
     @PostMapping("/logins")
     public ServerResponseVO login(@RequestBody User user) {
         Subject userSubject = SecurityUtils.getSubject();
@@ -52,7 +59,8 @@ public class LoginController {
         }catch (DisabledAccountException e) {
             return ServerResponseVO.error(ServerResponseEnum.ACCOUNT_IS_DISABLED);
         }catch (IncorrectCredentialsException e) {
-            return ServerResponseVO.error(ServerResponseEnum.INCORRECT_CREDENTIALS);
+            throw e;
+//            return ServerResponseVO.error(ServerResponseEnum.INCORRECT_CREDENTIALS);
         }catch (Throwable e) {
             e.printStackTrace();
             return ServerResponseVO.error(ServerResponseEnum.ERROR);

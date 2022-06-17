@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qrcodelogin.Dao.StockMapper">
+
+    <sql id="base_column_list">
+        id, name, count, sale, version
+    </sql>
+    <select id="getStockById" parameterType="int" resultType="com.qrcodelogin.entity.Stock">
+        select
+        <include refid="base_column_list"/>
+        from t_stock
+        where id = #{sid}
+    </select>
+
+    <update id="updateStockById">
+        UPDATE t_stock
+        SET count = #{stock.count},
+            sale = #{stock.sale},
+            version = #{stock.version}
+        WHERE id = #{stock.id}
+    </update>
+</mapper>

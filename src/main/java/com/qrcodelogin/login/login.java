@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 @CrossOrigin
 @Controller
 public class login {
-    @Value(("${server.port}"))
+    @Value("${server.port}")
     private int port ;
 
     @GetMapping("/login")

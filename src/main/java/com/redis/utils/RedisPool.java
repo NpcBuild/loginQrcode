@@ -1,5 +1,6 @@
 package com.redis.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 @Component
+@Slf4j
 public class RedisPool {
 
     private static JedisCluster  pool;
@@ -56,13 +58,14 @@ public class RedisPool {
         return pool;
     }
 
+    //todo 实现上方的获取实例
     public static void jedisPoolClose(JedisCluster jedis) {
         if (jedis != null) {
-            try {
-                jedis.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                jedis.close();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
         }
     }
 }

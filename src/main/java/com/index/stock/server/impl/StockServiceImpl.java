@@ -64,10 +64,6 @@ public class StockServiceImpl implements StockService {
             throw new RuntimeException("并发更新库存失败");
         }
     }
-    public int updateStockByOptimistic(Stock stock) {
-
-        return stockMapper.updateByOptimistic(stock);
-    }
 
     private Stock checkStock(int sid) throws Exception {
         Stock stock = stockService.getStockById(sid);
@@ -92,5 +88,11 @@ public class StockServiceImpl implements StockService {
             throw new RuntimeException("创建订单失败");
         }
         return res;
+    }
+
+    @Override
+    public int updateStockByOptimistic(Stock stock) {
+
+        return stockMapper.updateByOptimistic(stock);
     }
 }

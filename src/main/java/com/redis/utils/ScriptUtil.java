@@ -10,7 +10,6 @@ import java.util.Arrays;
  * 解析 lua
  */
 public class ScriptUtil {
-    // 解析 lua
     public static String getScript(String path) {
         StringBuilder stringBuilder = new StringBuilder();
 

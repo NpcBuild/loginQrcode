@@ -206,6 +206,7 @@
                     <include>**/*.xml</include>
                     <include>**/*.yml</include>
                     <include>**/*.html</include>
+                    <include>**/*.lua</include>
                 </includes>
                 <filtering>false</filtering>
             </resource>

@@ -3,12 +3,14 @@ package com.redis;
 import com.index.stock.server.StockService;
 import com.qrcodelogin.entity.Stock;
 import com.redis.utils.RedisPoolUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class RedisPreheatRunner implements ApplicationRunner {
 
     @Autowired
@@ -18,6 +20,7 @@ public class RedisPreheatRunner implements ApplicationRunner {
 
         //从数据库查询热卖商品
         Stock stock = stockService.getStockById(1);
+        log.info("开始预热数据到Redis");
 
         // 删除旧缓存
         RedisPoolUtil.del(RedisKeysConstant.STOCK_COUNT + stock.getCount());

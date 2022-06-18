@@ -27,7 +27,7 @@ public class StockController {
     public String buy(){
         try {
             if (RedisOrderLimit.limit()) {
-                stockOrderService.createOrder(1);
+                stockOrderService.createOrderAsync(1);
 
             }
         } catch (Exception e) {

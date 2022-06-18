@@ -32,6 +32,8 @@ public class RedisOrderLimit {
             if (FAIL_CODE != (Long) result) {
                 log.info("成功获取令牌");
                 return true;
+            } else {
+                log.info("请求太多被拦截");
             }
         } catch (Exception e) {
             log.error("limit 获取 Jedis 实例失败：", e);

@@ -1,5 +1,6 @@
 package com.index.stock.server;
 
+import com.qrcodelogin.entity.Stock;
 import org.springframework.stereotype.Component;
 
 /**
@@ -17,5 +18,12 @@ public interface StockOrderService {
      *
      * @param sid
      */
-    void createOrder(int sid) throws Exception;
+    void createOrderAsync(int sid) throws Exception;
+
+    /**
+     * Kafka 消费消息
+     *
+     * @param stock
+     */
+    public int consumerTopicToCreateOrderWithKafka(Stock stock) throws Exception;
 }

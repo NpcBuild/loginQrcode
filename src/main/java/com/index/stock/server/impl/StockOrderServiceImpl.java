@@ -3,15 +3,20 @@ package com.index.stock.server.impl;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.index.stock.server.StockOrderService;
+import com.index.stock.server.StockService;
 import com.qrcodelogin.Dao.StockOrderMapper;
 import com.qrcodelogin.entity.Stock;
+import com.qrcodelogin.entity.StockOrder;
 import com.redis.RedisKeysConstant;
+import com.redis.StockWithRedis;
 import com.redis.utils.RedisPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @Slf4j
 @Service
@@ -21,6 +26,8 @@ public class StockOrderServiceImpl implements StockOrderService {
     private KafkaTemplate<Object,Object> kafkaTemplate;
     @Autowired
     private StockOrderMapper stockOrderMapper;
+    @Autowired
+    private StockService stockService;
 
     @Value("${spring.kafka.template.createOrder-Topic}")
     private String kafkaTopic;
@@ -33,12 +40,38 @@ public class StockOrderServiceImpl implements StockOrderService {
     }
 
     @Override
-    public void createOrder(int sid) throws Exception {
+    public void createOrderAsync(int sid) throws Exception {
         // 校验库存
         Stock stock = checkStockWithRedis(sid);
         // 下单请求发送至 kafka，需要序列化 stock
         kafkaTemplate.send(kafkaTopic, gson.toJson(stock));
         log.info("秒杀下单消息发送至 Kafka 成功");
+    }
+
+    /**
+     * 更新数据库和 DB
+     */
+    private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
+        int res = stockService.updateStockByOptimistic(stock);
+        if (res == 0) {
+            throw new RuntimeException("并发更新库存失败");
+        }
+        // 更新 Redis
+        StockWithRedis.updateStockWithRedis(stock);
+    }
+
+    @Override
+    public int consumerTopicToCreateOrderWithKafka(Stock stock) throws Exception {
+        // 乐观锁更新库存和 Redis
+        saleStockOptimsticWithRedis(stock);
+        int res = createOrder(stock);
+        if (res == 1) {
+            log.info("Kafka 消费 Topic 创建订单成功");
+        } else {
+            log.info("Kafka 消费 Topic 创建订单失败");
+        }
+
+        return res;
     }
 
     /**
@@ -63,5 +96,20 @@ public class StockOrderServiceImpl implements StockOrderService {
         stock.setName("手机");
 
         return stock;
+    }
+
+    /**
+     * 创建订单
+     */
+    private int createOrder(Stock stock) throws Exception {
+        StockOrder order = new StockOrder();
+        order.setSid(stock.getId());
+        order.setName(stock.getName());
+        order.setCreate_time(new Date());
+        int res = stockOrderMapper.insertSelective(order);
+        if (res == 0) {
+            throw new RuntimeException("创建订单失败");
+        }
+        return res;
     }
 }

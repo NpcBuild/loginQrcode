@@ -39,6 +39,10 @@ public class QQWry {
     private final long indexHead;
     private final long indexTail;
 
+    static {
+        new QQWry();
+    }
+
     /**
      * Create QQWry by loading qqwry.dat from classpath.
      *

@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MyLoginInterceptor implements HandlerInterceptor {
     private static final String LOGIN_PATH = "login";
     private static Map<String, AtomicInteger> visitCount;
+    @Autowired
+    private static final QQWry qqWry = new QQWry();
 //    private static final QQWry qqWry;
     static {
         visitCount = new HashMap<>(31);
@@ -37,8 +39,8 @@ public class MyLoginInterceptor implements HandlerInterceptor {
         log.info("login拦截器，调用了:{}",request.getRequestURI());
         if (request.getRequestURI().equals(LOGIN_PATH)){
             String ipAddress = IpUtils.getIpAddress(request);
-//            String province = qqWry.findIP(ipAddress).getMainInfo();
-            String province = new QQWry().findIP(ipAddress).getMainInfo();
+            String province = qqWry.findIP(ipAddress).getMainInfo();
+//            String province = new QQWry().findIP(ipAddress).getMainInfo();
             if (visitCount.containsKey(province)){
                 visitCount.put(province,new AtomicInteger(visitCount.get(province).incrementAndGet()));
             }else {

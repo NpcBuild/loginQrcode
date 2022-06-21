@@ -1,8 +1,10 @@
 package com.redis.limit;
 
+import com.redis.lock.service.LockService;
 import com.redis.utils.RedisPool;
 import com.redis.utils.ScriptUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
 
@@ -12,7 +14,10 @@ import java.util.Collections;
 public class RedisOrderLimit {
     private static final int FAIL_CODE = 0;
 
-    private static Integer limit = 5;
+    private static Integer limit = 50;
+
+    @Autowired
+    private static LockService lockService;
 
     /**
      * Redis 限流
@@ -20,6 +25,7 @@ public class RedisOrderLimit {
     public static Boolean limit() {
         JedisCluster jedis = null;
         Object result = null;
+        Long start = System.currentTimeMillis();
         try {
             // 获取 jedis 实例
             jedis = RedisPool.getJedis();

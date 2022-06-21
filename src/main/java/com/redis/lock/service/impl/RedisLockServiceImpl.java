@@ -1,10 +1,7 @@
 package com.redis.lock.service.impl;
 
 import com.redis.lock.service.LockService;
-import com.redis.lock.service.RedisLockService;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
@@ -18,7 +15,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
-public class RedisLockServiceImpl implements RedisLockService {
+public class RedisLockServiceImpl implements LockService {
 
     private static final String LOCK_SUCCESS = "OK";
 
@@ -30,6 +27,7 @@ public class RedisLockServiceImpl implements RedisLockService {
         redisTemplate.delete(key);
     }
 
+    @Override
     public synchronized boolean isLock(String key, int seconds) {
         /**
          * 存储数据到缓存中，并制定过期时间和当Key存在时是否覆盖。

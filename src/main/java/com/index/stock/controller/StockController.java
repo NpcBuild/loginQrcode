@@ -28,7 +28,6 @@ public class StockController {
         try {
             if (RedisOrderLimit.limit()) {
                 stockOrderService.createOrderAsync(1);
-
             }
         } catch (Exception e) {
             log.error("创建订单失败" + e);

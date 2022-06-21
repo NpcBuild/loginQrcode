@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StockMapper {
     Stock getStockById (@Param("sid") int sid);
-    int updateStockById (@Param("stock") Stock stock);
+//    int updateStockById (@Param("stock") Stock stock);
     /**
      * 乐观锁 version
      */

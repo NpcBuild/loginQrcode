@@ -12,11 +12,4 @@
         where id = #{sid}
     </select>
 
-    <update id="updateStockById">
-        UPDATE t_stock
-        SET count = #{stock.count},
-            sale = #{stock.sale},
-            version = #{stock.version}
-        WHERE id = #{stock.id}
-    </update>
 </mapper>

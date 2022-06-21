@@ -9,12 +9,14 @@ import com.qrcodelogin.entity.Stock;
 import com.qrcodelogin.entity.StockOrder;
 import com.redis.RedisKeysConstant;
 import com.redis.StockWithRedis;
+import com.redis.lock.service.LockService;
 import com.redis.utils.RedisPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.annotation.ApplicationScope;
 
 import java.util.Date;
 
@@ -28,6 +30,8 @@ public class StockOrderServiceImpl implements StockOrderService {
     private StockOrderMapper stockOrderMapper;
     @Autowired
     private StockService stockService;
+    @Autowired
+    private LockService lockService;
 
     @Value("${spring.kafka.template.createOrder-Topic}")
     private String kafkaTopic;
@@ -52,6 +56,9 @@ public class StockOrderServiceImpl implements StockOrderService {
      * 更新数据库和 DB
      */
     private void saleStockOptimsticWithRedis(Stock stock) throws Exception {
+        /**
+         * planA 乐观锁
+         */
         int res = stockService.updateStockByOptimistic(stock);
         if (res == 0) {
             throw new RuntimeException("并发更新库存失败");
